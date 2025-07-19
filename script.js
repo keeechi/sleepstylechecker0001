@@ -63,14 +63,14 @@ function createTable(data) {
   table.className = "table table-bordered table-hover table-sm";
 
   const thead = document.createElement("thead");
-  thead.innerHTML = `
+  thead.innerHTML = 
     <tr>
       <th>取得</th>
       <th>図鑑No</th>
       <th>ポケモン名</th>
       <th>レア度</th>
       <th>睡眠タイプ</th>
-    </tr>`;
+    </tr>;
 
   const tbody = document.createElement("tbody");
   for (const row of data) {
@@ -81,9 +81,7 @@ function createTable(data) {
     tdCheck.className = "checkbox-cell";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.dataset.id = row.ID;
     checkbox.checked = !!checkState[row.ID];
-
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         checkState[row.ID] = true;
@@ -93,17 +91,15 @@ function createTable(data) {
       saveToStorage();
       syncCheckboxes(row.ID, checkbox.checked);
     });
-
     tdCheck.appendChild(checkbox);
-    tr.appendChild(tdCheck);
 
-    // 残りの列
-    tr.innerHTML += `
+    tr.appendChild(tdCheck);
+    tr.innerHTML += 
       <td>${row.No}</td>
       <td>${row.Name}</td>
       <td>${row.DisplayRarity}</td>
-      <td>${row.Style}</td>`;
-
+      <td>${row.Style}</td>;
+    tr.children[0].appendChild(checkbox);
     tbody.appendChild(tr);
   }
 
@@ -114,8 +110,13 @@ function createTable(data) {
 
 // 同じIDのチェックボックスを全タブで連動
 function syncCheckboxes(id, checked) {
-  document.querySelectorAll(`input[type=checkbox][data-id='${id}']`).forEach(cb => {
-    cb.checked = checked;
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    const tr = cb.closest("tr");
+    if (!tr) return;
+    const cells = tr.querySelectorAll("td");
+    if (cells[1] && cells[1].textContent === id.toString()) {
+      cb.checked = checked;
+    }
   });
 }
 
@@ -144,7 +145,12 @@ function bindExportImport() {
         if (typeof imported === "object") {
           checkState = imported;
           saveToStorage();
-          renderAllTabs(); // 再描画で復元
+          renderAllTabs();
         }
       } catch {
-        ale
+        alert("無効なJSONファイルです。");
+      }
+    };
+    reader.readAsText(file);
+  });
+}
