@@ -81,8 +81,9 @@ function createTable(data) {
     tdCheck.className = "checkbox-cell";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
+    checkbox.dataset.id = row.ID;
     checkbox.checked = !!checkState[row.ID];
-    checkbox.dataset.id = row.ID; // 連動用の識別子
+
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         checkState[row.ID] = true;
@@ -92,9 +93,11 @@ function createTable(data) {
       saveToStorage();
       syncCheckboxes(row.ID, checkbox.checked);
     });
-    tdCheck.appendChild(checkbox);
 
+    tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
+
+    // 残りの列
     tr.innerHTML += `
       <td>${row.No}</td>
       <td>${row.Name}</td>
@@ -108,7 +111,6 @@ function createTable(data) {
   table.appendChild(tbody);
   return table;
 }
-
 
 // 同じIDのチェックボックスを全タブで連動
 function syncCheckboxes(id, checked) {
@@ -142,12 +144,7 @@ function bindExportImport() {
         if (typeof imported === "object") {
           checkState = imported;
           saveToStorage();
-          renderAllTabs();
+          renderAllTabs(); // 再描画で復元
         }
       } catch {
-        alert("無効なJSONファイルです。");
-      }
-    };
-    reader.readAsText(file);
-  });
-}
+        ale
