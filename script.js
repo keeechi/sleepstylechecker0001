@@ -82,6 +82,7 @@ function createTable(data) {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = !!checkState[row.ID];
+    checkbox.dataset.id = row.ID; // 連動用の識別子
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         checkState[row.ID] = true;
@@ -99,7 +100,7 @@ function createTable(data) {
       <td>${row.Name}</td>
       <td>${row.DisplayRarity}</td>
       <td>${row.Style}</td>`;
-    tr.children[0].appendChild(checkbox);
+
     tbody.appendChild(tr);
   }
 
@@ -107,6 +108,7 @@ function createTable(data) {
   table.appendChild(tbody);
   return table;
 }
+
 
 // 同じIDのチェックボックスを全タブで連動
 function syncCheckboxes(id, checked) {
