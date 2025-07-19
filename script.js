@@ -63,14 +63,14 @@ function createTable(data) {
   table.className = "table table-bordered table-hover table-sm";
 
   const thead = document.createElement("thead");
-  thead.innerHTML = 
-    <tr>
-      <th>取得</th>
-      <th>図鑑No</th>
-      <th>ポケモン名</th>
-      <th>レア度</th>
-      <th>睡眠タイプ</th>
-    </tr>;
+thead.innerHTML = `
+  <tr>
+    <th>取得</th>
+    <th>図鑑No</th>
+    <th>ポケモン名</th>
+    <th>レア度</th>
+    <th>睡眠タイプ</th>
+  </tr>`;
 
   const tbody = document.createElement("tbody");
   for (const row of data) {
@@ -94,11 +94,11 @@ function createTable(data) {
     tdCheck.appendChild(checkbox);
 
     tr.appendChild(tdCheck);
-    tr.innerHTML += 
-      <td>${row.No}</td>
-      <td>${row.Name}</td>
-      <td>${row.DisplayRarity}</td>
-      <td>${row.Style}</td>;
+tr.innerHTML += `
+  <td>${row.No}</td>
+  <td>${row.Name}</td>
+  <td>${row.DisplayRarity}</td>
+  <td>${row.Style}</td>`;
     tr.children[0].appendChild(checkbox);
     tbody.appendChild(tr);
   }
