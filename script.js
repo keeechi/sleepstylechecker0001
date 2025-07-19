@@ -63,25 +63,32 @@ function createTable(data) {
   table.className = "table table-bordered table-hover table-sm";
 
   const thead = document.createElement("thead");
-thead.innerHTML = `
-  <tr>
-    <th>取得</th>
-    <th>図鑑No</th>
-    <th>ポケモン名</th>
-    <th>レア度</th>
-    <th>睡眠タイプ</th>
-  </tr>`;
+  thead.innerHTML = `
+    <tr>
+      <th>取得</th>
+      <th>図鑑No</th>
+      <th>ポケモン名</th>
+      <th>レア度</th>
+      <th>睡眠タイプ</th>
+      <th>ワカクサ本島</th>
+      <th>シアンの砂浜</th>
+      <th>トープ洞窟</th>
+      <th>ウノハナ雪原</th>
+      <th>ラピスラズリ湖畔</th>
+      <th>ゴールド旧発電所</th>
+    </tr>`;
 
   const tbody = document.createElement("tbody");
   for (const row of data) {
     const tr = document.createElement("tr");
 
-    // 取得状況（チェックボックス）
+    // チェックボックス
     const tdCheck = document.createElement("td");
-    tdCheck.className = "checkbox-cell";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
+    checkbox.dataset.id = row.ID;
     checkbox.checked = !!checkState[row.ID];
+
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         checkState[row.ID] = true;
@@ -91,15 +98,24 @@ thead.innerHTML = `
       saveToStorage();
       syncCheckboxes(row.ID, checkbox.checked);
     });
-    tdCheck.appendChild(checkbox);
 
+    tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
-tr.innerHTML += `
-  <td>${row.No}</td>
-  <td>${row.Name}</td>
-  <td>${row.DisplayRarity}</td>
-  <td>${row.Style}</td>`;
-    tr.children[0].appendChild(checkbox);
+
+    // その他の基本情報
+    tr.innerHTML += `
+      <td>${row.No}</td>
+      <td>${row.Name}</td>
+      <td>${row.DisplayRarity}</td>
+      <td>${row.Style}</td>
+      <td>${row["ワカクサ本島"] || ""}</td>
+      <td>${row["シアンの砂浜"] || ""}</td>
+      <td>${row["トープ洞窟"] || ""}</td>
+      <td>${row["ウノハナ雪原"] || ""}</td>
+      <td>${row["ラピスラズリ湖畔"] || ""}</td>
+      <td>${row["ゴールド旧発電所"] || ""}</td>
+    `;
+
     tbody.appendChild(tr);
   }
 
