@@ -123,18 +123,18 @@ function createTable(data) {
     tr.appendChild(tdCheck);
 
     // その他の基本情報
-tr.innerHTML += `
-  <td>${row.No}</td>
-  <td>${row.Name}</td>
-  <td>${row.DisplayRarity}</td>
-  <td>${row.Style}</td>
-  <td>${sanitize(row["ワカクサ本島"])}</td>
-  <td>${sanitize(row["シアンの砂浜"])}</td>
-  <td>${sanitize(row["トープ洞窟"])}</td>
-  <td>${sanitize(row["ウノハナ雪原"])}</td>
-  <td>${sanitize(row["ラピスラズリ湖畔"])}</td>
-  <td>${sanitize(row["ゴールド旧発電所"])}</td>
-`;
+    tr.innerHTML += `
+      <td>${row.No}</td>
+      <td>${row.Name}</td>
+      <td>${row.DisplayRarity}</td>
+      <td>${row.Style}</td>
+      <td>${row["ワカクサ本島"] || ""}</td>
+      <td>${row["シアンの砂浜"] || ""}</td>
+      <td>${row["トープ洞窟"] || ""}</td>
+      <td>${row["ウノハナ雪原"] || ""}</td>
+      <td>${row["ラピスラズリ湖畔"] || ""}</td>
+      <td>${row["ゴールド旧発電所"] || ""}</td>
+    `;
 
     tbody.appendChild(tr);
   }
