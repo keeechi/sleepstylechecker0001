@@ -31,16 +31,33 @@ function saveToStorage() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(checkState));
 }
 
-// タブごとの表を描画
+// タブごとの表を描画（出現しないポケモンは除外）
 function renderAllTabs() {
-  for (const [key, records] of Object.entries(rawData)) {
-    const tabId = getTabIdByName(key);
+  const fieldKeys = {
+    "ワカクサ本島": "ワカクサ本島",
+    "シアンの砂浜": "シアンの砂浜",
+    "トープ洞窟": "トープ洞窟",
+    "ウノハナ雪原": "ウノハナ雪原",
+    "ラピスラズリ湖畔": "ラピスラズリ湖畔",
+    "ゴールド旧発電所": "ゴールド旧発電所"
+  };
+
+  for (const [tabName, records] of Object.entries(rawData)) {
+    const tabId = getTabIdByName(tabName);
     const container = document.getElementById(tabId);
-    if (container) {
-      const table = createTable(records);
-      container.innerHTML = "";
-      container.appendChild(table);
+    if (!container) continue;
+
+    let displayRecords = records;
+
+    // 「すべての寝顔一覧」以外は該当フィールドに出現するポケモンのみ表示
+    if (fieldKeys[tabName]) {
+      const fieldKey = fieldKeys[tabName];
+      displayRecords = records.filter(row => row[fieldKey] && row[fieldKey].trim() !== "");
     }
+
+    const table = createTable(displayRecords);
+    container.innerHTML = "";
+    container.appendChild(table);
   }
 }
 
