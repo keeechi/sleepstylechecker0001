@@ -52,7 +52,10 @@ function renderAllTabs() {
     // 「すべての寝顔一覧」以外は該当フィールドに出現するポケモンのみ表示
     if (fieldKeys[tabName]) {
       const fieldKey = fieldKeys[tabName];
-      displayRecords = records.filter(row => row[fieldKey] && row[fieldKey].trim() !== "");
+      displayRecords = records.filter(row => {
+        const val = row[fieldKey];
+        return val !== null && val !== "null" && val.trim?.() !== "";
+      });
     }
 
     const table = createTable(displayRecords);
