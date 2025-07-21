@@ -118,16 +118,22 @@ function createTable(data) {
     checkbox.type = "checkbox";
     checkbox.dataset.id = row.ID;
     checkbox.checked = !!checkState[row.ID];
+    checkbox.setAttribute("data-id", row.ID);
 
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) {
-        checkState[row.ID] = true;
-      } else {
-        delete checkState[row.ID];
-      }
-      saveToStorage();
-      syncCheckboxes(row.ID, checkbox.checked);
-    });
+
+checkbox.addEventListener("change", () => {
+  if (checkbox.checked) {
+    checkState[row.ID] = true;
+  } else {
+    delete checkState[row.ID];
+  }
+  saveToStorage();
+
+  // 他の同一IDのチェックボックスに状態を反映
+  document.querySelectorAll(`input[type="checkbox"][data-id="${row.ID}"]`).forEach(cb => {
+    if (cb !== checkbox) cb.checked = checkbox.checked;
+  });
+});
 
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
@@ -162,6 +168,26 @@ function syncCheckboxes(id, checked) {
       cb.checked = checked;
     }
   });
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  rawData = await fetchData(jsonPath);
+  checkState = loadFromStorage();
+
+  // ★ チェック状態の確認用ログ
+  console.log("ロードされたチェックデータ:", checkState);
+
+  renderAllTabs();
+  bindExportImport();
+});
+
+function loadFromStorage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return data && typeof data === "object" ? data : {};
+  } catch {
+    return {};
+  }
 }
 
 // バックアップ用：エクスポート・インポート
