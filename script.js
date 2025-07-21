@@ -156,11 +156,9 @@ function createTable(data) {
 
 // 同じIDのチェックボックスを全タブで連動
 function syncCheckboxes(id, checked) {
-  document.querySelectorAll("input[type=checkbox]").forEach(cb => {
-    const tr = cb.closest("tr");
-    if (!tr) return;
-    const cells = tr.querySelectorAll("td");
-    if (cells[1] && cells[1].textContent === id.toString()) {
+  const allCheckboxes = document.querySelectorAll('input[type="checkbox"][data-id="' + id + '"]');
+  allCheckboxes.forEach(cb => {
+    if (cb.checked !== checked) {
       cb.checked = checked;
     }
   });
