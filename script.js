@@ -42,19 +42,29 @@ function renderAllTabs() {
     "ゴールド旧発電所": "ゴールド旧発電所"
   };
 
-  for (const [tabName, records] of Object.entries(rawData)) {
+  const baseData = rawData["すべての寝顔一覧"] || [];
+
+  for (const tabName of [
+    "すべての寝顔一覧",
+    "ワカクサ本島",
+    "シアンの砂浜",
+    "トープ洞窟",
+    "ウノハナ雪原",
+    "ラピスラズリ湖畔",
+    "ゴールド旧発電所"
+  ]) {
     const tabId = getTabIdByName(tabName);
     const container = document.getElementById(tabId);
     if (!container) continue;
 
-    let displayRecords = records;
+    let displayRecords = baseData;
 
     // 「すべての寝顔一覧」以外は該当フィールドに出現するポケモンのみ表示
     if (fieldKeys[tabName]) {
       const fieldKey = fieldKeys[tabName];
-      displayRecords = records.filter(row => {
+      displayRecords = baseData.filter(row => {
         const val = row[fieldKey];
-        return val !== null && val !== "null" && val.trim?.() !== "";
+        return typeof val === "string" && val.trim() !== "";
       });
     }
 
