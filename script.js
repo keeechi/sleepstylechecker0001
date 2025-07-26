@@ -170,93 +170,60 @@ function getTabIdByName(name) {
 
 // 表の作成
 function createTable(data) {
+  const tableWrapper = document.createElement("div");
   const table = document.createElement("table");
   table.className = "table table-bordered table-hover table-sm";
 
-  const tableWrapper = document.createElement("div");
-
-// 表にフィルターUI追加
-  const filterWrapper = document.createElement("div");
-  filterWrapper.className = "mb-2";
-
-  const styleTypes = ["うとうと", "すやすや", "ぐっすり"];
-  const rarities = ["★1", "★2", "★3", "★4", "★5"];
-
-  const selectedStyles = new Set(styleTypes);
-  const selectedRarities = new Set(rarities);
-
-  const styleLabel = document.createElement("label");
-  styleLabel.textContent = "睡眠タイプ: ";
-  filterWrapper.appendChild(styleLabel);
-
-  styleTypes.forEach(type => {
-    const label = document.createElement("label");
-    label.className = "ms-2";
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.checked = true;
-    input.className = "me-1";
-    input.addEventListener("change", () => {
-      if (input.checked) selectedStyles.add(type);
-      else selectedStyles.delete(type);
-      updateFilteredRows();
-    });
-    label.appendChild(input);
-    label.append(type);
-    filterWrapper.appendChild(label);
-  });
-
-// 表の作成-再開
-  const rarityLabel = document.createElement("label");
-  rarityLabel.textContent = "　レア度: ";
-  filterWrapper.appendChild(rarityLabel);
-
-  rarities.forEach(rarity => {
-    const label = document.createElement("label");
-    label.className = "ms-2";
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.checked = true;
-    input.className = "me-1";
-    input.addEventListener("change", () => {
-      if (input.checked) selectedRarities.add(rarity);
-      else selectedRarities.delete(rarity);
-      updateFilteredRows();
-    });
-    label.appendChild(input);
-    label.append(rarity);
-    filterWrapper.appendChild(label);
-  });
-
-  tableWrapper.appendChild(filterWrapper);
-
   const thead = document.createElement("thead");
-  thead.innerHTML = `
-    <tr>
-      <th>取得</th>
-      <th>図鑑No</th>
-      <th>ポケモン名</th>
-      <th>レア度</th>
-      <th>睡眠タイプ</th>
-      <th>ワカクサ本島</th>
-      <th>シアンの砂浜</th>
-      <th>トープ洞窟</th>
-      <th>ウノハナ雪原</th>
-      <th>ラピスラズリ湖畔</th>
-      <th>ゴールド旧発電所</th>
-    </tr>`;
+  const filterRow = document.createElement("tr");
+  const headerRow = document.createElement("tr");
+
+  const columns = [
+    "取得", "図鑑No", "ポケモン名", "レア度", "睡眠タイプ",
+    "ワカクサ本島", "シアンの砂浜", "トープ洞窟", "ウノハナ雪原",
+    "ラピスラズリ湖畔", "ゴールド旧発電所"
+  ];
+
+  const filters = {};
+  const selectElements = {};
+
+  columns.forEach((col, index) => {
+    const th = document.createElement("th");
+    th.textContent = col;
+    headerRow.appendChild(th);
+
+    const filterTh = document.createElement("th");
+    if (col === "レア度" || col === "睡眠タイプ") {
+      const select = document.createElement("select");
+      select.className = "form-select form-select-sm";
+      select.innerHTML = `<option value="">全て</option>`;
+      selectElements[col] = select;
+      filterTh.appendChild(select);
+
+      select.addEventListener("change", () => {
+        updateFilteredRows();
+      });
+    }
+    filterRow.appendChild(filterTh);
+  });
+
+  thead.appendChild(filterRow);
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+
+  const allRows = [];
+
   for (const row of data) {
     const tr = document.createElement("tr");
 
-    // チェックボックス
+    // チェックボックス列
     const tdCheck = document.createElement("td");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.setAttribute("data-id", row.ID);
     checkbox.checked = !!checkState[row.ID];
-
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) {
         checkState[row.ID] = true;
@@ -267,12 +234,11 @@ function createTable(data) {
       syncCheckboxes(row.ID, checkbox.checked);
       renderSummaryTable();
     });
-
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
 
     // 残りの列
-    const columns = [
+    const rowValues = [
       row.No, row.Name, row.DisplayRarity, row.Style,
       row["ワカクサ本島"] || "",
       row["シアンの砂浜"] || "",
@@ -282,27 +248,44 @@ function createTable(data) {
       row["ゴールド旧発電所"] || ""
     ];
 
-    for (const col of columns) {
+    rowValues.forEach((val, idx) => {
       const td = document.createElement("td");
-      td.textContent = col;
+      td.textContent = val;
       tr.appendChild(td);
-    }
+    });
 
     tbody.appendChild(tr);
+    allRows.push({ element: tr, row });
   }
 
-  table.appendChild(thead);
   table.appendChild(tbody);
-  renderSummaryTable();
   tableWrapper.appendChild(table);
 
+  // ユニーク値を抽出してセレクトボックスに反映
+  const raritySet = new Set(data.map(row => row.DisplayRarity));
+  const styleSet = new Set(data.map(row => row.Style));
+  raritySet.forEach(val => {
+    const option = document.createElement("option");
+    option.value = val;
+    option.textContent = val;
+    selectElements["レア度"].appendChild(option);
+  });
+  styleSet.forEach(val => {
+    const option = document.createElement("option");
+    option.value = val;
+    option.textContent = val;
+    selectElements["睡眠タイプ"].appendChild(option);
+  });
+
   function updateFilteredRows() {
-    const rows = table.querySelectorAll("tbody tr");
-    rows.forEach(row => {
-      const style = row.cells[4].textContent;
-      const rarity = row.cells[3].textContent;
-      const show = selectedStyles.has(style) && selectedRarities.has(rarity);
-      row.style.display = show ? "" : "none";
+    const rarity = selectElements["レア度"].value;
+    const style = selectElements["睡眠タイプ"].value;
+
+    allRows.forEach(({ element, row }) => {
+      const show =
+        (rarity === "" || row.DisplayRarity === rarity) &&
+        (style === "" || row.Style === style);
+      element.style.display = show ? "" : "none";
     });
   }
 
