@@ -10,6 +10,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   checkState = loadFromStorage();
   renderAllTabs();
   bindExportImport();
+  renderSummaryTable();
 });
 
 // JSONデータ取得
@@ -77,15 +78,7 @@ function renderSummaryTable() {
   const description = container.querySelector("p");
   description.insertAdjacentElement("afterend", summaryTable);
 }
-
-// ページ初期化時に呼び出す
-window.addEventListener("DOMContentLoaded", async () => {
-  rawData = await fetchData(jsonPath);
-  checkState = loadFromStorage();
-  renderAllTabs();
-  bindExportImport();
-  renderSummaryTable();  // ←ここで呼び出し
-});
+;
 
 // タブごとの表を描画（出現しないポケモンは除外）
 function renderAllTabs() {
