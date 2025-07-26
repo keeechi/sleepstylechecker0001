@@ -301,7 +301,7 @@ function createTable(data) {
     selectElements["睡眠タイプ"].appendChild(option);
   });
 
-Const toHiragana = str =>
+const toHiragana = str =>
   str.replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
 
 function updateFilteredRows() {
