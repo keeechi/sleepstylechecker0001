@@ -1,3 +1,4 @@
+
 const jsonPath = "pokemonsleep_data.json";
 const STORAGE_KEY = "pokemonSleepChecks";
 let rawData = {};
@@ -20,7 +21,8 @@ async function fetchData(path) {
 // ローカルストレージから読み込み
 function loadFromStorage() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return data && typeof data === "object" ? data : {};
   } catch {
     return {};
   }
@@ -59,7 +61,6 @@ function renderAllTabs() {
 
     let displayRecords = baseData;
 
-    // 「すべての寝顔一覧」以外は該当フィールドに出現するポケモンのみ表示
     if (fieldKeys[tabName]) {
       const fieldKey = fieldKeys[tabName];
       displayRecords = baseData.filter(row => {
@@ -112,33 +113,25 @@ function createTable(data) {
   for (const row of data) {
     const tr = document.createElement("tr");
 
-    // チェックボックス
     const tdCheck = document.createElement("td");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.dataset.id = row.ID;
-    checkbox.checked = !!checkState[row.ID];
     checkbox.setAttribute("data-id", row.ID);
+    checkbox.checked = !!checkState[row.ID];
 
-
-checkbox.addEventListener("change", () => {
-  if (checkbox.checked) {
-    checkState[row.ID] = true;
-  } else {
-    delete checkState[row.ID];
-  }
-  saveToStorage();
-
-  // 他の同一IDのチェックボックスに状態を反映
-  document.querySelectorAll(`input[type="checkbox"][data-id="${row.ID}"]`).forEach(cb => {
-    if (cb !== checkbox) cb.checked = checkbox.checked;
-  });
-});
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        checkState[row.ID] = true;
+      } else {
+        delete checkState[row.ID];
+      }
+      saveToStorage();
+      syncCheckboxes(row.ID, checkbox.checked);
+    });
 
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
 
-    // その他の基本情報
     tr.innerHTML += `
       <td>${row.No}</td>
       <td>${row.Name}</td>
@@ -162,32 +155,12 @@ checkbox.addEventListener("change", () => {
 
 // 同じIDのチェックボックスを全タブで連動
 function syncCheckboxes(id, checked) {
-  const allCheckboxes = document.querySelectorAll('input[type="checkbox"][data-id="' + id + '"]');
-  allCheckboxes.forEach(cb => {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"][data-id="' + id + '"]');
+  checkboxes.forEach(cb => {
     if (cb.checked !== checked) {
       cb.checked = checked;
     }
   });
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-  rawData = await fetchData(jsonPath);
-  checkState = loadFromStorage();
-
-  // ★ チェック状態の確認用ログ
-  console.log("ロードされたチェックデータ:", checkState);
-
-  renderAllTabs();
-  bindExportImport();
-});
-
-function loadFromStorage() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return data && typeof data === "object" ? data : {};
-  } catch {
-    return {};
-  }
 }
 
 // バックアップ用：エクスポート・インポート
