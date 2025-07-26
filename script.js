@@ -149,9 +149,9 @@ function renderAllTabs() {
       });
     }
 
-    const table = createTable(displayRecords);
-    container.innerHTML = "";
-    container.appendChild(table);
+  const tableWrapper = createTable(displayRecords);
+  container.innerHTML = "";
+  container.appendChild(tableWrapper);
   }
 }
 
