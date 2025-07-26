@@ -37,6 +37,11 @@ function saveToStorage() {
 // サマリー表を描画
 function renderSummaryTable() {
   const container = document.querySelector(".container");
+  const baseData = rawData["すべての寝顔一覧"] || [];
+
+  const fields = ["全寝顔", "ワカクサ本島", "シアンの砂浜", "トープ洞窟", "ウノハナ雪原", "ラピスラズリ湖畔", "ゴールド旧発電所"];
+  const styles = ["うとうと", "すやすや", "ぐっすり"];
+
   const summaryTable = document.createElement("table");
   summaryTable.className = "table table-bordered table-sm mt-4";
 
@@ -44,34 +49,57 @@ function renderSummaryTable() {
   thead.innerHTML = `
     <tr>
       <th></th>
-      <th>全寝顔</th>
-      <th>ワカクサ本島</th>
-      <th>シアンの砂浜</th>
-      <th>トープ洞窟</th>
-      <th>ウノハナ雪原</th>
-      <th>ラピスラズリ湖畔</th>
-      <th>ゴールド旧発電所</th>
+      ${fields.map(f => `<th>${f}</th>`).join("")}
     </tr>`;
   summaryTable.appendChild(thead);
 
-  const rows = [
-    ["うとうと", "a", "b", "c", "d", "e", "f", "g"],
-    ["すやすや", "h", "i", "j", "k", "l", "m", "n"],
-    ["ぐっすり", "o", "p", "q", "r", "s", "t", "u"],
-    ["合計", "v", "w", "x", "A", "B", "C", "D"]
-  ];
-
   const tbody = document.createElement("tbody");
-  for (const rowData of rows) {
+
+  for (const style of styles) {
     const tr = document.createElement("tr");
-    for (const cell of rowData) {
+    const styleCell = document.createElement("th");
+    styleCell.textContent = style;
+    tr.appendChild(styleCell);
+
+    for (const field of fields) {
+      const filtered = baseData.filter(row => {
+        if (row.Style !== style) return false;
+        if (field === "全寝顔") return true;
+        return typeof row[field] === "string" && row[field].trim() !== "";
+      });
+
+      const total = filtered.length;
+      const checked = filtered.filter(row => checkState[row.ID]).length;
+      const rate = total === 0 ? 0 : Math.round((checked / total) * 100);
       const td = document.createElement("td");
-      td.textContent = cell;
+      td.innerText = `${checked} / ${total}\n取得率: ${rate}%`;
       tr.appendChild(td);
     }
+
     tbody.appendChild(tr);
   }
 
+  // 合計行
+  const trTotal = document.createElement("tr");
+  const totalTh = document.createElement("th");
+  totalTh.textContent = "合計";
+  trTotal.appendChild(totalTh);
+
+  for (const field of fields) {
+    const filtered = baseData.filter(row => {
+      if (field === "全寝顔") return true;
+      return typeof row[field] === "string" && row[field].trim() !== "";
+    });
+
+    const total = filtered.length;
+    const checked = filtered.filter(row => checkState[row.ID]).length;
+    const rate = total === 0 ? 0 : Math.round((checked / total) * 100);
+    const td = document.createElement("td");
+    td.innerText = `${checked} / ${total}\n取得率: ${rate}%`;
+    trTotal.appendChild(td);
+  }
+
+  tbody.appendChild(trTotal);
   summaryTable.appendChild(tbody);
 
   // フィールド説明文の直後に挿入
