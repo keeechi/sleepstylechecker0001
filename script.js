@@ -39,6 +39,11 @@ function renderSummaryTable() {
   const container = document.querySelector(".container");
   const baseData = rawData["すべての寝顔一覧"] || [];
 
+// 既存のサマリー表を削除
+  const existing = container.querySelector("table.mt-4");
+  if (existing) existing.remove();
+
+//描画
   const fields = ["全寝顔", "ワカクサ本島", "シアンの砂浜", "トープ洞窟", "ウノハナ雪原", "ラピスラズリ湖畔", "ゴールド旧発電所"];
   const styles = ["うとうと", "すやすや", "ぐっすり"];
 
@@ -203,6 +208,7 @@ function createTable(data) {
       }
       saveToStorage();
       syncCheckboxes(row.ID, checkbox.checked);
+      renderSummaryTable();
     });
 
     tdCheck.appendChild(checkbox);
@@ -231,6 +237,7 @@ function createTable(data) {
   table.appendChild(thead);
   table.appendChild(tbody);
   return table;
+  renderSummaryTable();
 }
 
 // 同じIDのチェックボックスを全タブで連動
