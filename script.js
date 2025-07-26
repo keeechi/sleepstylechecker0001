@@ -113,6 +113,7 @@ function createTable(data) {
   for (const row of data) {
     const tr = document.createElement("tr");
 
+    // チェックボックス
     const tdCheck = document.createElement("td");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -132,18 +133,22 @@ function createTable(data) {
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
 
-    tr.innerHTML += `
-      <td>${row.No}</td>
-      <td>${row.Name}</td>
-      <td>${row.DisplayRarity}</td>
-      <td>${row.Style}</td>
-      <td>${row["ワカクサ本島"] || ""}</td>
-      <td>${row["シアンの砂浜"] || ""}</td>
-      <td>${row["トープ洞窟"] || ""}</td>
-      <td>${row["ウノハナ雪原"] || ""}</td>
-      <td>${row["ラピスラズリ湖畔"] || ""}</td>
-      <td>${row["ゴールド旧発電所"] || ""}</td>
-    `;
+    // 残りの列
+    const columns = [
+      row.No, row.Name, row.DisplayRarity, row.Style,
+      row["ワカクサ本島"] || "",
+      row["シアンの砂浜"] || "",
+      row["トープ洞窟"] || "",
+      row["ウノハナ雪原"] || "",
+      row["ラピスラズリ湖畔"] || "",
+      row["ゴールド旧発電所"] || ""
+    ];
+
+    for (const col of columns) {
+      const td = document.createElement("td");
+      td.textContent = col;
+      tr.appendChild(td);
+    }
 
     tbody.appendChild(tr);
   }
