@@ -173,6 +173,63 @@ function createTable(data) {
   const table = document.createElement("table");
   table.className = "table table-bordered table-hover table-sm";
 
+  const tableWrapper = document.createElement("div");
+
+// 表にフィルターUI追加
+  const filterWrapper = document.createElement("div");
+  filterWrapper.className = "mb-2";
+
+  const styleTypes = ["うとうと", "すやすや", "ぐっすり"];
+  const rarities = ["★1", "★2", "★3", "★4", "★5"];
+
+  const selectedStyles = new Set(styleTypes);
+  const selectedRarities = new Set(rarities);
+
+  const styleLabel = document.createElement("label");
+  styleLabel.textContent = "睡眠タイプ: ";
+  filterWrapper.appendChild(styleLabel);
+
+  styleTypes.forEach(type => {
+    const label = document.createElement("label");
+    label.className = "ms-2";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = true;
+    input.className = "me-1";
+    input.addEventListener("change", () => {
+      if (input.checked) selectedStyles.add(type);
+      else selectedStyles.delete(type);
+      updateFilteredRows();
+    });
+    label.appendChild(input);
+    label.append(type);
+    filterWrapper.appendChild(label);
+  });
+
+// 表の作成-再開
+  const rarityLabel = document.createElement("label");
+  rarityLabel.textContent = "　レア度: ";
+  filterWrapper.appendChild(rarityLabel);
+
+  rarities.forEach(rarity => {
+    const label = document.createElement("label");
+    label.className = "ms-2";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = true;
+    input.className = "me-1";
+    input.addEventListener("change", () => {
+      if (input.checked) selectedRarities.add(rarity);
+      else selectedRarities.delete(rarity);
+      updateFilteredRows();
+    });
+    label.appendChild(input);
+    label.append(rarity);
+    filterWrapper.appendChild(label);
+  });
+
+  tableWrapper.appendChild(filterWrapper);
+
   const thead = document.createElement("thead");
   thead.innerHTML = `
     <tr>
@@ -236,8 +293,20 @@ function createTable(data) {
 
   table.appendChild(thead);
   table.appendChild(tbody);
-  return table;
   renderSummaryTable();
+  tableWrapper.appendChild(table);
+
+  function updateFilteredRows() {
+    const rows = table.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+      const style = row.cells[4].textContent;
+      const rarity = row.cells[3].textContent;
+      const show = selectedStyles.has(style) && selectedRarities.has(rarity);
+      row.style.display = show ? "" : "none";
+    });
+  }
+
+  return tableWrapper;
 }
 
 // 同じIDのチェックボックスを全タブで連動
