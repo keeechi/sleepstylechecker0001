@@ -188,24 +188,48 @@ function createTable(data) {
   const selectElements = {};
 
   columns.forEach((col, index) => {
-    const th = document.createElement("th");
-    th.textContent = col;
-    headerRow.appendChild(th);
+  const th = document.createElement("th");
+  th.textContent = col;
+  headerRow.appendChild(th);
 
-    const filterTh = document.createElement("th");
-    if (col === "レア度" || col === "睡眠タイプ") {
-      const select = document.createElement("select");
-      select.className = "form-select form-select-sm";
-      select.innerHTML = `<option value="">全て</option>`;
-      selectElements[col] = select;
-      filterTh.appendChild(select);
+  const filterTh = document.createElement("th");
 
-      select.addEventListener("change", () => {
-        updateFilteredRows();
-      });
-    }
-    filterRow.appendChild(filterTh);
-  });
+  if (col === "取得") {
+    const select = document.createElement("select");
+    select.className = "form-select form-select-sm";
+    select.innerHTML = `
+      <option value="">全て</option>
+      <option value="取得済">取得済</option>
+      <option value="未取得">未取得</option>`;
+    filterTh.appendChild(select);
+    selectElements[col] = select;
+
+    select.addEventListener("change", updateFilteredRows);
+  }
+
+  else if (col === "レア度" || col === "睡眠タイプ") {
+    const select = document.createElement("select");
+    select.className = "form-select form-select-sm";
+    select.innerHTML = `<option value="">全て</option>`;
+    selectElements[col] = select;
+    filterTh.appendChild(select);
+
+    select.addEventListener("change", updateFilteredRows);
+  }
+
+  else if (col === "ポケモン名") {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "名前で検索";
+    input.className = "form-control form-control-sm";
+    filterTh.appendChild(input);
+    selectElements[col] = input;
+
+    input.addEventListener("input", updateFilteredRows);
+  }
+
+  filterRow.appendChild(filterTh);
+});
 
   thead.appendChild(filterRow);
   thead.appendChild(headerRow);
@@ -277,17 +301,25 @@ function createTable(data) {
     selectElements["睡眠タイプ"].appendChild(option);
   });
 
-  function updateFilteredRows() {
-    const rarity = selectElements["レア度"].value;
-    const style = selectElements["睡眠タイプ"].value;
+function updateFilteredRows() {
+  const rarity = selectElements["レア度"].value;
+  const style = selectElements["睡眠タイプ"].value;
+  const nameFilter = selectElements["ポケモン名"].value.trim();
+  const checkFilter = selectElements["取得"].value;
 
-    allRows.forEach(({ element, row }) => {
-      const show =
-        (rarity === "" || row.DisplayRarity === rarity) &&
-        (style === "" || row.Style === style);
-      element.style.display = show ? "" : "none";
-    });
-  }
+  allRows.forEach(({ element, row }) => {
+    const isChecked = !!checkState[row.ID];
+    const matchesRarity = !rarity || row.DisplayRarity === rarity;
+    const matchesStyle = !style || row.Style === style;
+    const matchesName = !nameFilter || row.Name.includes(nameFilter);
+    const matchesCheck = !checkFilter ||
+      (checkFilter === "取得済" && isChecked) ||
+      (checkFilter === "未取得" && !isChecked);
+
+    const shouldShow = matchesRarity && matchesStyle && matchesName && matchesCheck;
+    element.style.display = shouldShow ? "" : "none";
+  });
+}
 
   return tableWrapper;
 }
