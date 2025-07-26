@@ -301,17 +301,28 @@ function createTable(data) {
     selectElements["睡眠タイプ"].appendChild(option);
   });
 
+Const toHiragana = str =>
+  str.replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+
 function updateFilteredRows() {
   const rarity = selectElements["レア度"].value;
   const style = selectElements["睡眠タイプ"].value;
   const nameFilter = selectElements["ポケモン名"].value.trim();
   const checkFilter = selectElements["取得"].value;
 
+  const nameFilterHira = toHiragana(nameFilter);
+
   allRows.forEach(({ element, row }) => {
     const isChecked = !!checkState[row.ID];
+    const name = row.Name;
+    const nameHira = toHiragana(name);
+
     const matchesRarity = !rarity || row.DisplayRarity === rarity;
     const matchesStyle = !style || row.Style === style;
-    const matchesName = !nameFilter || row.Name.includes(nameFilter);
+    const matchesName =
+      !nameFilter ||
+      name.includes(nameFilter) ||
+      nameHira.includes(nameFilterHira);
     const matchesCheck = !checkFilter ||
       (checkFilter === "取得済" && isChecked) ||
       (checkFilter === "未取得" && !isChecked);
