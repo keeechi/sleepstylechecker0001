@@ -33,6 +33,60 @@ function saveToStorage() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(checkState));
 }
 
+// サマリー表を描画
+function renderSummaryTable() {
+  const container = document.querySelector(".container");
+  const summaryTable = document.createElement("table");
+  summaryTable.className = "table table-bordered table-sm mt-4";
+
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th></th>
+      <th>全寝顔</th>
+      <th>ワカクサ本島</th>
+      <th>シアンの砂浜</th>
+      <th>トープ洞窟</th>
+      <th>ウノハナ雪原</th>
+      <th>ラピスラズリ湖畔</th>
+      <th>ゴールド旧発電所</th>
+    </tr>`;
+  summaryTable.appendChild(thead);
+
+  const rows = [
+    ["うとうと", "a", "b", "c", "d", "e", "f", "g"],
+    ["すやすや", "h", "i", "j", "k", "l", "m", "n"],
+    ["ぐっすり", "o", "p", "q", "r", "s", "t", "u"],
+    ["合計", "v", "w", "x", "A", "B", "C", "D"]
+  ];
+
+  const tbody = document.createElement("tbody");
+  for (const rowData of rows) {
+    const tr = document.createElement("tr");
+    for (const cell of rowData) {
+      const td = document.createElement("td");
+      td.textContent = cell;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  summaryTable.appendChild(tbody);
+
+  // フィールド説明文の直後に挿入
+  const description = container.querySelector("p");
+  description.insertAdjacentElement("afterend", summaryTable);
+}
+
+// ページ初期化時に呼び出す
+window.addEventListener("DOMContentLoaded", async () => {
+  rawData = await fetchData(jsonPath);
+  checkState = loadFromStorage();
+  renderAllTabs();
+  bindExportImport();
+  renderSummaryTable();  // ←ここで呼び出し
+});
+
 // タブごとの表を描画（出現しないポケモンは除外）
 function renderAllTabs() {
   const fieldKeys = {
