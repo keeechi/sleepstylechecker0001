@@ -10,6 +10,12 @@ h1 {
   color: #343a40;
 }
 
+/* サブタブ（.tab-pane）の切り替え制御 */
+#tab-reverse .nav-tabs,
+#tab-reverse .tab-content {
+  display: none !important;
+}
+
 /* テーブル表示 */
 table {
   font-size: 0.9rem;
