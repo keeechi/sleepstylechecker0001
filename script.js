@@ -127,7 +127,7 @@ function renderMainTabs() {
   const tabsWrapper = document.createElement("div");
   tabsWrapper.id = "main-tabs";
 
-  // タブ見出し
+  // タブ見出し（親タブ）
   const nav = document.createElement("ul");
   nav.className = "nav nav-tabs mt-3";
   nav.innerHTML = `
@@ -143,6 +143,7 @@ function renderMainTabs() {
   const content = document.createElement("div");
   content.className = "tab-content border border-top-0 p-3 bg-white";
   content.innerHTML = `
+    <!-- サブタブを含むタブ -->
     <div class="tab-pane fade show active" id="tab-alltabs">
       <ul class="nav nav-tabs mb-3" id="subTabNav">
         <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-all">すべての寝顔一覧</a></li>
@@ -163,6 +164,8 @@ function renderMainTabs() {
         <div class="tab-pane fade" id="tab-gold"></div>
       </div>
     </div>
+
+    <!-- 逆引き検索のタブ -->
     <div class="tab-pane fade" id="tab-reverse">
       <div id="reverse-search" class="mb-3">
         <label>現在のフィールド:
@@ -188,12 +191,11 @@ function renderMainTabs() {
     </div>`;
   tabsWrapper.appendChild(content);
 
-  // SummaryTableの直後に挿入（重要な修正点）
+  // SummaryTableの直後に挿入
   const summaryTable = document.querySelector("table.mt-4");
   if (summaryTable) {
     summaryTable.insertAdjacentElement("afterend", tabsWrapper);
   } else {
-    // fallback: container末尾
     container.appendChild(tabsWrapper);
   }
 
