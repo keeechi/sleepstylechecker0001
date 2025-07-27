@@ -225,13 +225,31 @@ function generateRankOptions() {
   return options;
 }
 
-// ランクの順序を比較できるように数値化
+// ランクの順序を数値化
 function getRankIndex(rank) {
-  const levels = { ノーマル: 0, スーパー: 1, ハイパー: 2, マスター: 3 };
+  const levels = { ノーマル:0, スーパー:1, ハイパー:2, マスター:3 };
   const match = rank.match(/(ノーマル|スーパー|ハイパー|マスター)(\d+)/);
   if (!match) return -1;
-  const [_, label, num] = match;
-  return levels[label] * 100 + parseInt(num);
+  return levels[match[1]] * 100 + parseInt(match[2], 10);
+}
+
+// 色付き◓+相対ランクに変換する
+function formatRankDisplay(rankValue) {
+  const r = parseInt(rankValue, 10);
+  if (isNaN(r)) return "";
+  let color, relative;
+  if (r >= 1 && r <= 5) {
+    color = "#FF0000"; relative = r;
+  } else if (r <= 10) {
+    color = "#0000FF"; relative = r - 5;
+  } else if (r <= 15) {
+    color = "#FFFF00"; relative = r - 10;
+  } else if (r <= 35) {
+    color = "#9933FF"; relative = r - 15;
+  } else {
+    return String(rankValue);
+  }
+  return `<span style="color:${color};">◓${relative}</span>`;
 }
 
 // 逆引き検索イベント
