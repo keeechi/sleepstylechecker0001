@@ -188,10 +188,17 @@ function renderMainTabs() {
     </div>`;
   tabsWrapper.appendChild(content);
 
-  container.appendChild(tabsWrapper);
+  // SummaryTableの直後に挿入（重要な修正点）
+  const summaryTable = document.querySelector("table.mt-4");
+  if (summaryTable) {
+    summaryTable.insertAdjacentElement("afterend", tabsWrapper);
+  } else {
+    // fallback: container末尾
+    container.appendChild(tabsWrapper);
+  }
 
-  renderAllTabs();  // 通常のタブ内容を再描画
-  bindReverseSearch(); // 逆引き機能をバインド
+  renderAllTabs();
+  bindReverseSearch();
 }
 
 function generateRankOptions() {
