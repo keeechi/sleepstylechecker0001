@@ -10,9 +10,8 @@ h1 {
   color: #343a40;
 }
 
-/* サブタブ（.tab-pane）の切り替え制御 */
-#tab-reverse .nav-tabs,
-#tab-reverse .tab-content {
+/* 寝顔の一覧タブ自体を非表示にする（逆引きがアクティブ時） */
+.tab-content > .tab-pane:not(.active) {
   display: none !important;
 }
 
