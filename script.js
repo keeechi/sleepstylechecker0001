@@ -139,13 +139,12 @@ function renderMainTabs() {
     </li>`;
   tabsWrapper.appendChild(nav);
 
-// タブ本体
-const content = document.createElement("div");
-content.className = "tab-content border border-top-0 p-3 bg-white";
-content.innerHTML = `
-  <!-- 「寝顔の一覧・フィールドごとの情報」タブの中にだけサブタブを含める -->
-  <div class="tab-pane fade show active" id="tab-alltabs">
-    <div class="subtab-wrapper">
+  // タブ本体
+  const content = document.createElement("div");
+  content.className = "tab-content border border-top-0 p-3 bg-white";
+  content.innerHTML = `
+    <!-- サブタブを含むタブ -->
+    <div class="tab-pane fade show active" id="tab-alltabs">
       <ul class="nav nav-tabs mb-3" id="subTabNav">
         <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-all">すべての寝顔一覧</a></li>
         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-wakakusa">ワカクサ本島</a></li>
@@ -165,33 +164,31 @@ content.innerHTML = `
         <div class="tab-pane fade" id="tab-gold"></div>
       </div>
     </div>
-  </div>
 
-  <!-- 「現在のフィールド・ランクから検索」タブ -->
-  <div class="tab-pane fade" id="tab-reverse">
-    <div id="reverse-search" class="mb-3">
-      <label>現在のフィールド:
-        <select id="reverseField" class="form-select form-select-sm d-inline w-auto ms-2">
-          <option value="">--選択--</option>
-          <option value="ワカクサ本島">ワカクサ本島</option>
-          <option value="シアンの砂浜">シアンの砂浜</option>
-          <option value="トープ洞窟">トープ洞窟</option>
-          <option value="ウノハナ雪原">ウノハナ雪原</option>
-          <option value="ラピスラズリ湖畔">ラピスラズリ湖畔</option>
-          <option value="ゴールド旧発電所">ゴールド旧発電所</option>
-        </select>
-      </label>
-      <label class="ms-4">現在のランク:
-        <select id="reverseRank" class="form-select form-select-sm d-inline w-auto ms-2">
-          <option value="">--選択--</option>
-          ${generateRankOptions()}
-        </select>
-      </label>
-      <button id="reverseBtn" class="btn btn-sm btn-outline-primary ms-4">未取得の寝顔を表示</button>
-    </div>
-    <div id="reverseResult"></div>
-  </div>`;
-  
+    <!-- 逆引き検索のタブ -->
+    <div class="tab-pane fade" id="tab-reverse">
+      <div id="reverse-search" class="mb-3">
+        <label>現在のフィールド:
+          <select id="reverseField" class="form-select form-select-sm d-inline w-auto ms-2">
+            <option value="">--選択--</option>
+            <option value="ワカクサ本島">ワカクサ本島</option>
+            <option value="シアンの砂浜">シアンの砂浜</option>
+            <option value="トープ洞窟">トープ洞窟</option>
+            <option value="ウノハナ雪原">ウノハナ雪原</option>
+            <option value="ラピスラズリ湖畔">ラピスラズリ湖畔</option>
+            <option value="ゴールド旧発電所">ゴールド旧発電所</option>
+          </select>
+        </label>
+        <label class="ms-4">現在のランク:
+          <select id="reverseRank" class="form-select form-select-sm d-inline w-auto ms-2">
+            <option value="">--選択--</option>
+            ${generateRankOptions()}
+          </select>
+        </label>
+        <button id="reverseBtn" class="btn btn-sm btn-outline-primary ms-4">未取得の寝顔を表示</button>
+      </div>
+      <div id="reverseResult"></div>
+    </div>`;
   tabsWrapper.appendChild(content);
 
   // SummaryTableの直後に挿入
