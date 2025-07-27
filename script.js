@@ -111,6 +111,9 @@ function renderSummaryTable() {
   // フィールド説明文の直後に挿入
   const description = container.querySelector("p");
   description.insertAdjacentElement("afterend", summaryTable);
+
+  // ここでメインタブ（AllTab + 逆引き）を描画
+  renderMainTabs();  // ← 追加
 }
 ;
 
@@ -141,13 +144,24 @@ function renderMainTabs() {
   content.className = "tab-content border border-top-0 p-3 bg-white";
   content.innerHTML = `
     <div class="tab-pane fade show active" id="tab-alltabs">
-      <div id="tab-all"></div>
-      <div id="tab-wakakusa"></div>
-      <div id="tab-cyan"></div>
-      <div id="tab-taupe"></div>
-      <div id="tab-unohana"></div>
-      <div id="tab-lapis"></div>
-      <div id="tab-gold"></div>
+      <ul class="nav nav-tabs mb-3" id="subTabNav">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-all">すべての寝顔一覧</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-wakakusa">ワカクサ本島</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-cyan">シアンの砂浜</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-taupe">トープ洞窟</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-unohana">ウノハナ雪原</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-lapis">ラピスラズリ湖畔</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-gold">ゴールド旧発電所</a></li>
+      </ul>
+      <div class="tab-content" id="subTabContent">
+        <div class="tab-pane fade show active" id="tab-all"></div>
+        <div class="tab-pane fade" id="tab-wakakusa"></div>
+        <div class="tab-pane fade" id="tab-cyan"></div>
+        <div class="tab-pane fade" id="tab-taupe"></div>
+        <div class="tab-pane fade" id="tab-unohana"></div>
+        <div class="tab-pane fade" id="tab-lapis"></div>
+        <div class="tab-pane fade" id="tab-gold"></div>
+      </div>
     </div>
     <div class="tab-pane fade" id="tab-reverse">
       <div id="reverse-search" class="mb-3">
