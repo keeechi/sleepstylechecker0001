@@ -191,16 +191,27 @@ function renderMainTabs() {
     </div>`;
   tabsWrapper.appendChild(content);
 
-  // SummaryTableの直後に挿入
-  const summaryTable = document.querySelector("table.mt-4");
-  if (summaryTable) {
-    summaryTable.insertAdjacentElement("afterend", tabsWrapper);
-  } else {
-    container.appendChild(tabsWrapper);
-  }
-
-  renderAllTabs();
-  bindReverseSearch();
+    // SummaryTableの直後に挿入
+    const summaryTable = document.querySelector("table.mt-4");
+    if (summaryTable) {
+      summaryTable.insertAdjacentElement("afterend", tabsWrapper);
+    } else {
+      container.appendChild(tabsWrapper);
+    }
+  
+    renderAllTabs();
+    bindReverseSearch();
+  
+  document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
+    tab.addEventListener("shown.bs.tab", event => {
+      const isReverse = event.target.getAttribute("href") === "#tab-reverse";
+      const alltabsPane = document.getElementById("tab-alltabs");
+      if (alltabsPane) {
+        alltabsPane.style.display = isReverse ? "none" : "";
+      }
+    });
+  });
+    
 }
 
 function generateRankOptions() {
