@@ -171,6 +171,87 @@ function getTabIdByName(name) {
 // 表の作成
 function createTable(data) {
   const tableWrapper = document.createElement("div");
+  
+// 一括チェックON/OFF ボタン + モーダル実装
+const controlWrapper = document.createElement("div");
+controlWrapper.className = "mb-2";
+
+// ボタン作成
+const checkAllBtn = document.createElement("button");
+checkAllBtn.className = "btn btn-sm btn-outline-success me-2";
+checkAllBtn.textContent = "全てを取得済にする";
+
+const uncheckAllBtn = document.createElement("button");
+uncheckAllBtn.className = "btn btn-sm btn-outline-danger";
+uncheckAllBtn.textContent = "全てを未取得にする";
+
+controlWrapper.appendChild(checkAllBtn);
+controlWrapper.appendChild(uncheckAllBtn);
+tableWrapper.appendChild(controlWrapper);
+
+// モーダル用のHTMLを作成
+const modal = document.createElement("div");
+modal.innerHTML = `
+<div class="modal fade" tabindex="-1" id="confirmModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">確認</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">この操作を実行しますか？</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">実行しません</button>
+        <button type="button" class="btn btn-primary" id="confirmOkBtn">実行します</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+document.body.appendChild(modal);
+
+// モーダル制御用
+let modalAction = null;
+const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+const confirmMessage = document.getElementById("confirmMessage");
+const confirmOkBtn = document.getElementById("confirmOkBtn");
+
+// ボタンイベント設定
+checkAllBtn.addEventListener("click", () => {
+  confirmMessage.textContent = "全ての寝顔を取得済の状態にしますか？";
+  modalAction = () => {
+    data.forEach(row => {
+      checkState[row.ID] = true;
+    });
+    saveToStorage();
+    renderAllTabs();
+    renderSummaryTable();
+  };
+  confirmModal.show();
+});
+
+uncheckAllBtn.addEventListener("click", () => {
+  confirmMessage.textContent = "全ての寝顔を未取得の状態にしますか？";
+  modalAction = () => {
+    data.forEach(row => {
+      delete checkState[row.ID];
+    });
+    saveToStorage();
+    renderAllTabs();
+    renderSummaryTable();
+  };
+  confirmModal.show();
+});
+
+// 実行ボタン押下時の動作
+confirmOkBtn.addEventListener("click", () => {
+  if (typeof modalAction === "function") {
+    modalAction();
+  }
+  confirmModal.hide();
+});
+  
   const table = document.createElement("table");
   table.className = "table table-bordered table-hover table-sm";
 
