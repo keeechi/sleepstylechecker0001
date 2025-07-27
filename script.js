@@ -11,6 +11,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   renderAllTabs();
   bindExportImport();
   renderSummaryTable();
+  renderMainTabs();
 });
 
 // JSONデータ取得
@@ -112,6 +113,122 @@ function renderSummaryTable() {
   description.insertAdjacentElement("afterend", summaryTable);
 }
 ;
+
+function renderMainTabs() {
+  const container = document.querySelector(".container");
+
+  // 既存タブを削除（再描画用）
+  const existing = document.getElementById("main-tabs");
+  if (existing) existing.remove();
+
+  const tabsWrapper = document.createElement("div");
+  tabsWrapper.id = "main-tabs";
+
+  // タブ見出し
+  const nav = document.createElement("ul");
+  nav.className = "nav nav-tabs mt-3";
+  nav.innerHTML = `
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#tab-alltabs">寝顔の一覧・フィールドごとの情報</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#tab-reverse">現在のフィールド・ランクから検索</a>
+    </li>`;
+  tabsWrapper.appendChild(nav);
+
+  // タブ本体
+  const content = document.createElement("div");
+  content.className = "tab-content border border-top-0 p-3 bg-white";
+  content.innerHTML = `
+    <div class="tab-pane fade show active" id="tab-alltabs">
+      <div id="tab-all"></div>
+      <div id="tab-wakakusa"></div>
+      <div id="tab-cyan"></div>
+      <div id="tab-taupe"></div>
+      <div id="tab-unohana"></div>
+      <div id="tab-lapis"></div>
+      <div id="tab-gold"></div>
+    </div>
+    <div class="tab-pane fade" id="tab-reverse">
+      <div id="reverse-search" class="mb-3">
+        <label>現在のフィールド:
+          <select id="reverseField" class="form-select form-select-sm d-inline w-auto ms-2">
+            <option value="">--選択--</option>
+            <option value="ワカクサ本島">ワカクサ本島</option>
+            <option value="シアンの砂浜">シアンの砂浜</option>
+            <option value="トープ洞窟">トープ洞窟</option>
+            <option value="ウノハナ雪原">ウノハナ雪原</option>
+            <option value="ラピスラズリ湖畔">ラピスラズリ湖畔</option>
+            <option value="ゴールド旧発電所">ゴールド旧発電所</option>
+          </select>
+        </label>
+        <label class="ms-4">現在のランク:
+          <select id="reverseRank" class="form-select form-select-sm d-inline w-auto ms-2">
+            <option value="">--選択--</option>
+            ${generateRankOptions()}
+          </select>
+        </label>
+        <button id="reverseBtn" class="btn btn-sm btn-outline-primary ms-4">未取得の寝顔を表示</button>
+      </div>
+      <div id="reverseResult"></div>
+    </div>`;
+  tabsWrapper.appendChild(content);
+
+  container.appendChild(tabsWrapper);
+
+  renderAllTabs();  // 通常のタブ内容を再描画
+  bindReverseSearch(); // 逆引き機能をバインド
+}
+
+function generateRankOptions() {
+  const groups = ["ノーマル", "スーパー", "ハイパー", "マスター"];
+  let options = "";
+  groups.forEach((g, i) => {
+    const count = g === "マスター" ? 20 : 5;
+    for (let j = 1; j <= count; j++) {
+      options += `<option value="${g}${j}">${g}${j}</option>`;
+    }
+  });
+  return options;
+}
+
+// ランクの順序を比較できるように数値化
+function getRankIndex(rank) {
+  const levels = { ノーマル: 0, スーパー: 1, ハイパー: 2, マスター: 3 };
+  const match = rank.match(/(ノーマル|スーパー|ハイパー|マスター)(\d+)/);
+  if (!match) return -1;
+  const [_, label, num] = match;
+  return levels[label] * 100 + parseInt(num);
+}
+
+// 逆引き検索イベント
+function bindReverseSearch() {
+  document.getElementById("reverseBtn").addEventListener("click", () => {
+    const field = document.getElementById("reverseField").value;
+    const rank = document.getElementById("reverseRank").value;
+    if (!field || !rank) return;
+
+    const baseData = rawData["すべての寝顔一覧"] || [];
+    const rankThreshold = getRankIndex(rank);
+
+    const filtered = baseData.filter(row => {
+      const fieldRank = row[field];
+      if (!fieldRank || getRankIndex(fieldRank) > rankThreshold) return false;
+      return !checkState[row.ID];
+    });
+
+    renderReverseResult(filtered);
+  });
+}
+
+// 逆引き結果テーブル描画
+function renderReverseResult(data) {
+  const container = document.getElementById("reverseResult");
+  container.innerHTML = ""; // クリア
+
+  const tableWrapper = createTable(data);
+  container.appendChild(tableWrapper);
+}
 
 // タブごとの表を描画（出現しないポケモンは除外）
 function renderAllTabs() {
@@ -227,6 +344,7 @@ checkAllBtn.addEventListener("click", () => {
     saveToStorage();
     renderAllTabs();
     renderSummaryTable();
+    renderMainTabs();
   };
   confirmModal.show();
 });
@@ -240,6 +358,7 @@ uncheckAllBtn.addEventListener("click", () => {
     saveToStorage();
     renderAllTabs();
     renderSummaryTable();
+    renderMainTabs();
   };
   confirmModal.show();
 });
@@ -338,6 +457,7 @@ confirmOkBtn.addEventListener("click", () => {
       saveToStorage();
       syncCheckboxes(row.ID, checkbox.checked);
       renderSummaryTable();
+      renderMainTabs();
     });
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
