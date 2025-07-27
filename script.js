@@ -235,6 +235,31 @@ function getRankIndex(rank) {
   return levels[label] * 100 + parseInt(num);
 }
 
+// 数値(1～35) → 色付き◓＋相対ランク にフォーマットするヘルパー
+function formatRankDisplay(rankValue) {
+  const r = parseInt(rankValue, 10);
+  if (isNaN(r)) return "";  // 空または不正値は空文字
+
+  let color, relative;
+  if (r >= 1 && r <= 5) {
+    color    = "#FF0000";      // ノーマル1～5
+    relative = r;
+  } else if (r <= 10) {
+    color    = "#0000FF";      // スーパー1～5
+    relative = r - 5;
+  } else if (r <= 15) {
+    color    = "#FFFF00";      // ハイパー1～5
+    relative = r - 10;
+  } else if (r <= 35) {
+    color    = "#9933FF";      // マスター1～20
+    relative = r - 15;
+  } else {
+    return String(rankValue);   // 範囲外はそのまま
+  }
+
+  return `<span style="color:${color};">◓${relative}</span>`;
+}
+
 // 逆引き検索イベント
 function bindReverseSearch() {
   document.getElementById("reverseBtn").addEventListener("click", () => {
@@ -501,22 +526,31 @@ confirmOkBtn.addEventListener("click", () => {
     tdCheck.appendChild(checkbox);
     tr.appendChild(tdCheck);
 
-    // 残りの列
-    const rowValues = [
-      row.No, row.Name, row.DisplayRarity, row.Style,
-      row["ワカクサ本島"] || "",
-      row["シアンの砂浜"] || "",
-      row["トープ洞窟"] || "",
-      row["ウノハナ雪原"] || "",
-      row["ラピスラズリ湖畔"] || "",
-      row["ゴールド旧発電所"] || ""
-    ];
-
-    rowValues.forEach((val, idx) => {
-      const td = document.createElement("td");
-      td.textContent = val;
-      tr.appendChild(td);
-    });
+// 各列の値（4番目以降がフィールドごとのランク数値）
++  const rowValues = [
++    row.No,
++    row.Name,
++    row.DisplayRarity,
++    row.Style,
++    row["ワカクサ本島"],
++    row["シアンの砂浜"],
++    row["トープ洞窟"],
++    row["ウノハナ雪原"],
++    row["ラピスラズリ湖畔"],
++    row["ゴールド旧発電所"]
++  ];
++
++  rowValues.forEach((val, idx) => {
++    const td = document.createElement("td");
++    // idx >= 4 は「フィールド列」にあたるので、色付き◓に変換して innerHTML で差し込む
++    if (idx >= 4) {
++      td.innerHTML = formatRankDisplay(val);
++    } else {
++      // それ以外の列はそのままテキスト表示
++      td.textContent = val != null ? val : "";
++    }
++    tr.appendChild(td);
++  });
 
     tbody.appendChild(tr);
     allRows.push({ element: tr, row });
