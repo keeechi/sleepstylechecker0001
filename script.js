@@ -266,6 +266,11 @@ function renderReverseResult(data) {
 
 // タブごとの表を描画（出現しないポケモンは除外）
 function renderAllTabs() {
+  const activeMainTab = document.querySelector(".nav-link.active[href^='#tab-']");
+  if (!activeMainTab || activeMainTab.getAttribute("href") !== "#tab-alltabs") {
+    return; // 表の描画は「寝顔の一覧」タブがアクティブなときだけ実行
+  }
+
   const fieldKeys = {
     "ワカクサ本島": "ワカクサ本島",
     "シアンの砂浜": "シアンの砂浜",
@@ -300,9 +305,9 @@ function renderAllTabs() {
       });
     }
 
-  const tableWrapper = createTable(displayRecords);
-  container.innerHTML = "";
-  container.appendChild(tableWrapper);
+    const tableWrapper = createTable(displayRecords);
+    container.innerHTML = "";
+    container.appendChild(tableWrapper);
   }
 }
 
